@@ -1,6 +1,7 @@
 // 云开发初始化
 wx.cloud.init({
-  env: 'cloud1-d3gip1pfpde1590f4',
+  env: '',
+//填写自己的微信云开发环境ID
   traceUser: true
 })
 
