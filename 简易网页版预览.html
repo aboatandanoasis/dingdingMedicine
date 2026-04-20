@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>用药提醒</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container" id="mainPage">
+    <div class="header">
+      <div class="header-left">
+        <span class="date" id="currentDate"></span>
+        <span class="greeting" id="greeting"></span>
+      </div>
+      <div class="header-right" onclick="goToHistory()">
+        <span class="history-link">📋 历史</span>
+      </div>
+    </div>
+    <div class="medicine-list" id="medicineList"></div>
+    <div class="confirm-section">
+      <button class="confirm-btn" id="confirmBtn" onclick="confirmAllTaken()">我已经吃了</button>
+    </div>
+    <div class="add-section">
+      <button class="add-btn" onclick="showAddDialog()">+ 添加药物</button>
+    </div>
+  </div>
+
+  <div class="container" id="historyPage" style="display: none;">
+    <div class="history-nav">
+      <span class="back-btn" onclick="goBack()">← 返回</span>
+      <span class="page-title">服药历史</span>
+    </div>
+    <div class="history-list" id="historyList"></div>
+    <div class="clear-section" id="clearSection" style="display: none;">
+      <button class="clear-btn" onclick="clearHistory()">清空记录</button>
+    </div>
+  </div>
+
+  <div class="mask" id="addDialog" style="display: none;">
+    <div class="dialog">
+      <div class="dialog-content">
+        <span class="dialog-title">添加新药物</span>
+        <div class="input-group">
+          <span class="input-label">药物名称</span>
+          <input type="text" class="input-field" id="drugName" placeholder="如：降压药">
+        </div>
+        <div class="input-group">
+          <span class="input-label">描述（颜色/形状）</span>
+          <input type="text" class="input-field" id="drugDesc" placeholder="如：白色圆形">
+        </div>
+        <div class="input-group">
+          <span class="input-label">每次用量</span>
+          <input type="number" class="input-field" id="drugDosage" placeholder="如：1">
+        </div>
+        <div class="input-group">
+          <span class="input-label">单位</span>
+          <select class="input-field" id="drugUnit">
+            <option value="片">片</option>
+            <option value="粒">粒</option>
+            <option value="颗">颗</option>
+            <option value="包">包</option>
+            <option value="毫升">毫升</option>
+          </select>
+        </div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="dialog-cancel" onclick="hideAddDialog()">取消</button>
+        <button class="dialog-confirm" onclick="addMedicine()">确认添加</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mask" id="editDialog" style="display: none;">
+    <div class="dialog">
+      <div class="dialog-content">
+        <span class="dialog-title">编辑药物</span>
+        <div class="input-group">
+          <span class="input-label">药物名称</span>
+          <input type="text" class="input-field" id="editDrugName" placeholder="如：降压药">
+        </div>
+        <div class="input-group">
+          <span class="input-label">描述（颜色/形状）</span>
+          <input type="text" class="input-field" id="editDrugDesc" placeholder="如：白色圆形">
+        </div>
+        <div class="input-group">
+          <span class="input-label">每次用量</span>
+          <input type="number" class="input-field" id="editDrugDosage" placeholder="如：1">
+        </div>
+        <div class="input-group">
+          <span class="input-label">单位</span>
+          <select class="input-field" id="editDrugUnit">
+            <option value="片">片</option>
+            <option value="粒">粒</option>
+            <option value="颗">颗</option>
+            <option value="包">包</option>
+            <option value="毫升">毫升</option>
+          </select>
+        </div>
+      </div>
+      <div class="dialog-buttons">
+        <button class="dialog-cancel" onclick="hideEditDialog()">取消</button>
+        <button class="dialog-confirm" onclick="saveEditMedicine()">保存</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
