@@ -30,7 +30,7 @@
 ## 3. 功能规划
 
 ### 当前版本 (v1.0 Demo)
-
+链接：https://open.weixin.qq.com/sns/getexpappinfo?appid=wx84b5f7e17deff38b&path=pages%2Findex%2Findex.html&token=5ea973ac5b794842bccc4887fb72c480#wechat-redirect
 - ✅ 药品管理：添加/编辑/删除药品信息
 - ✅ 状态切换：已吃/未到时间/过时未吃
 - ✅ 一键确认：点击大按钮即完成当日时段服药确认
