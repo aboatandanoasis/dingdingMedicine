@@ -1,0 +1,33 @@
+<!-- 服药历史记录页面 -->
+<view class="container">
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty" wx:if="{{!loading && records.length === 0}}">
+    <text class="empty-icon">📋</text>
+    <text class="empty-text">暂无服药记录</text>
+    <text class="empty-hint">确认服药后，记录会显示在这里</text>
+  </view>
+
+  <!-- 历史记录列表 -->
+  <view class="history-list" wx:if="{{!loading && records.length > 0}}">
+    <view class="date-group" wx:for="{{groupedRecords}}" wx:key="date">
+      <view class="date-header">
+        <text class="date-text">{{item.date}}</text>
+        <text class="record-count">共 {{item.records.length}} 次</text>
+      </view>
+      
+      <view class="record-card" wx:for="{{item.records}}" wx:for-item="record" wx:key="_id">
+        <text class="record-info">{{record.takeTimeStr}} · {{record.medicineName}} · {{record.dosage}}{{record.unit}} ✓</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 清空记录按钮 -->
+  <view class="clear-section" wx:if="{{records.length > 0}}">
+    <button class="clear-btn" bindtap="clearHistory">清空记录</button>
+  </view>
+</view>

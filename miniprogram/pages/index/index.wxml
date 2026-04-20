@@ -1,0 +1,249 @@
+<!-- 老人端主页 - 极简大字版 -->
+<view class="container">
+  <!-- 顶部日期提示 -->
+  <view class="header">
+    <view class="header-left">
+      <text class="date">{{currentDate}}</text>
+      <text class="greeting">{{greeting}}</text>
+    </view>
+    <view class="header-right" bindtap="goToHistory">
+      <text class="history-link">📋 历史</text>
+    </view>
+  </view>
+
+  <!-- 药品列表 -->
+  <view class="medicine-list">
+    <block wx:for="{{medicines}}" wx:key="id">
+      <!-- 滑动删除容器 -->
+      <view class="slide-container">
+        <view 
+          class="slide-content"
+          style="transform: translateX({{item.translateX || 0}}px);"
+          bindtouchstart="onTouchStart"
+          bindtouchmove="onTouchMove"
+          bindtouchend="onTouchEnd"
+          data-id="{{item.id}}"
+          bindlongpress="onLongPressAction"
+        >
+          <!-- 药品卡片 -->
+          <view class="medicine-card {{item.taken ? 'taken' : ''}}">
+            <!-- 药品图片占位（点击上传/预览） -->
+            <view class="medicine-image-box" bindtap="onImageTap" data-id="{{item.id}}" data-image="{{item.image}}">
+              <image 
+                wx:if="{{item.image}}" 
+                class="medicine-image" 
+                src="{{item.image}}" 
+                mode="aspectFill"
+              />
+              <view wx:else class="medicine-image-placeholder">
+                <text class="placeholder-text">点击上传</text>
+              </view>
+            </view>
+            
+            <!-- 药品信息 -->
+            <view class="medicine-info">
+              <text class="medicine-name">{{item.name}}</text>
+              <text class="medicine-desc">{{item.description}}</text>
+              <text class="medicine-dosage">每次 {{item.dosage}} {{item.unit}}</text>
+            </view>
+            
+            <!-- 状态标签 - 红绿灯样式（可点击切换） -->
+            <view class="medicine-status" bindtap="onStatusTap" data-id="{{item.id}}">
+              <!-- 已吃：绿色对勾 -->
+              <view wx:if="{{item.taken}}" class="status-wrapper">
+                <view class="status-icon status-done">
+                  <text class="icon-symbol">✓</text>
+                </view>
+                <text class="status-label label-done">已吃</text>
+              </view>
+              <!-- 过时未吃：红色叉号 -->
+              <view wx:elif="{{item.status === 'overdue'}}" class="status-wrapper">
+                <view class="status-icon status-overdue">
+                  <text class="icon-symbol">✗</text>
+                </view>
+                <text class="status-label label-overdue">过时未吃</text>
+              </view>
+              <!-- 未到时间：黄色圆圈 -->
+              <view wx:else class="status-wrapper">
+                <view class="status-icon status-pending">
+                  <text class="icon-symbol">○</text>
+                </view>
+                <text class="status-label label-pending">未到时间</text>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 删除按钮（隐藏在右侧） -->
+        <view class="delete-btn-wrapper">
+          <view 
+            class="delete-btn" 
+            bindtap="onDeleteMedicine" 
+            data-id="{{item.id}}"
+          >
+            <text class="delete-text">删除</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 无药品提示 -->
+    <view class="empty-tip" wx:if="{{medicines.length === 0}}">
+      <text>暂无用药提醒\n点击下方添加药物</text>
+    </view>
+  </view>
+
+  <!-- 一键确认按钮 -->
+  <view class="confirm-section">
+    <button 
+      class="confirm-btn {{allTaken ? 'completed' : ''}}" 
+      bindtap="confirmAllTaken"
+      hover-class="btn-hover"
+    >
+      {{allTaken ? '已完成' : '我已经吃了'}}
+    </button>
+  </view>
+
+  <!-- 添加药物按钮 -->
+  <view class="add-section">
+    <button class="add-btn" bindtap="showAddDialog" hover-class="btn-hover">
+      + 添加药物
+    </button>
+  </view>
+
+  <!-- 添加药物弹窗 -->
+  <view class="mask" wx:if="{{showDialog}}" catchtouchmove="preventBubble">
+    <view class="dialog" catchtap="preventBubble">
+      <scroll-view class="dialog-content" scroll-y="true">
+        <text class="dialog-title">添加新药物</text>
+        
+        <!-- 药品图片 -->
+        <view class="input-group">
+          <text class="input-label">药品图片</text>
+          <view class="edit-image-box" bindtap="onAddImageTap">
+            <image 
+              wx:if="{{newDrug.image}}" 
+              class="edit-image" 
+              src="{{newDrug.image}}" 
+              mode="aspectFill"
+            />
+            <view wx:else class="edit-image-placeholder">
+              <text class="placeholder-text">点击上传图片</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">药物名称</text>
+          <input 
+            class="input-field" 
+            placeholder="如：降压药" 
+            value="{{newDrug.name}}"
+            bindinput="onNameInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">描述（颜色/形状）</text>
+          <input 
+            class="input-field" 
+            placeholder="如：白色圆形" 
+            value="{{newDrug.description}}"
+            bindinput="onDescInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">每次用量</text>
+          <input 
+            class="input-field" 
+            placeholder="如：1" 
+            type="number"
+            value="{{newDrug.dosage}}"
+            bindinput="onDosageInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">单位</text>
+          <picker bindchange="onUnitChange" value="{{unitIndex}}" range="{{units}}">
+            <view class="picker-field">{{units[unitIndex]}}</view>
+          </picker>
+        </view>
+      </scroll-view>
+
+      <view class="dialog-buttons">
+        <button class="dialog-cancel" bindtap="hideDialog">取消</button>
+        <button class="dialog-confirm" bindtap="addMedicine">确认添加</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 编辑药物弹窗 -->
+  <view class="mask" wx:if="{{showEditDialog}}" catchtouchmove="preventBubble">
+    <view class="dialog" catchtap="preventBubble">
+      <scroll-view class="dialog-content" scroll-y="true">
+        <text class="dialog-title">编辑药物</text>
+        
+        <!-- 药品图片 -->
+        <view class="input-group">
+          <text class="input-label">药品图片</text>
+          <view class="edit-image-box" bindtap="onEditImageTap">
+            <image 
+              wx:if="{{editDrug.image}}" 
+              class="edit-image" 
+              src="{{editDrug.image}}" 
+              mode="aspectFill"
+            />
+            <view wx:else class="edit-image-placeholder">
+              <text class="placeholder-text">点击上传图片</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">药物名称</text>
+          <input 
+            class="input-field" 
+            placeholder="如：降压药" 
+            value="{{editDrug.name}}"
+            bindinput="onEditNameInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">描述（颜色/形状）</text>
+          <input 
+            class="input-field" 
+            placeholder="如：白色圆形" 
+            value="{{editDrug.description}}"
+            bindinput="onEditDescInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">每次用量</text>
+          <input 
+            class="input-field" 
+            placeholder="如：1" 
+            type="number"
+            value="{{editDrug.dosage}}"
+            bindinput="onEditDosageInput"
+          />
+        </view>
+
+        <view class="input-group">
+          <text class="input-label">单位</text>
+          <picker bindchange="onEditUnitChange" value="{{editDrug.unitIndex}}" range="{{units}}">
+            <view class="picker-field">{{units[editDrug.unitIndex]}}</view>
+          </picker>
+        </view>
+      </scroll-view>
+
+      <view class="dialog-buttons">
+        <button class="dialog-cancel" bindtap="hideEditDialog">取消</button>
+        <button class="dialog-confirm" bindtap="saveEditMedicine">保存</button>
+      </view>
+    </view>
+  </view>
+</view>
